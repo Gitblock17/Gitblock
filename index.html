@@ -1,1108 +1,700 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitBlock — Decentralized AI Inference Network</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        :root {
-            --bg: #000000;
-            --bg-card: #0a0a0a;
-            --bg-card-hover: #111111;
-            --border: #1a1a1a;
-            --text: #ffffff;
-            --text-secondary: #888888;
-            --text-dim: #555555;
-            --accent: #6366f1;
-            --accent-light: #818cf8;
-            --accent-glow: rgba(99, 102, 241, 0.15);
-            --gradient-1: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7);
-            --gradient-2: linear-gradient(135deg, #06b6d4, #3b82f6, #6366f1);
-            --green: #22c55e;
-            --red: #ef4444;
-            --yellow: #eab308;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* ── NAV ── */
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            padding: 0 2rem;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .nav-logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 800;
-            font-size: 1.2rem;
-            text-decoration: none;
-            color: var(--text);
-        }
-
-        .nav-logo .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: var(--gradient-1);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            font-size: 0.8rem;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-
-        .nav-links a:hover { color: var(--text); }
-
-        .nav-cta {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .btn {
-            padding: 8px 20px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-ghost {
-            background: transparent;
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-        }
-
-        .btn-ghost:hover { color: var(--text); border-color: #333; }
-
-        .btn-primary {
-            background: var(--gradient-1);
-            color: white;
-        }
-
-        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
-
-        .btn-large {
-            padding: 12px 28px;
-            font-size: 0.95rem;
-            border-radius: 10px;
-        }
-
-        /* ── HERO ── */
-        .hero {
-            padding: 140px 2rem 80px;
-            max-width: 1200px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 16px;
-            border-radius: 100px;
-            border: 1px solid var(--border);
-            background: var(--bg-card);
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-        }
-
-        .hero-badge .dot {
-            width: 6px;
-            height: 6px;
-            background: var(--green);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-
-        .hero h1 {
-            font-size: clamp(2.5rem, 6vw, 4.5rem);
-            font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 24px;
-            letter-spacing: -0.03em;
-        }
-
-        .hero h1 .gradient-text {
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero-desc {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            max-width: 700px;
-            margin: 0 auto 32px;
-            line-height: 1.7;
-        }
-
-        .hero-features {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 40px;
-        }
-
-        .hero-feature {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 100px;
-            background: var(--accent-glow);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            font-size: 0.8rem;
-            color: var(--accent-light);
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 16px;
-            justify-content: center;
-            margin-bottom: 60px;
-        }
-
-        /* ── STATS ── */
-        .stats-bar {
-            display: flex;
-            justify-content: center;
-            gap: 60px;
-            padding: 40px 0;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .stat {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 800;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .stat-label {
-            font-size: 0.8rem;
-            color: var(--text-dim);
-            margin-top: 4px;
-        }
-
-        /* ── PARTNERS ── */
-        .partners {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 40px;
-            padding: 40px 2rem;
-            flex-wrap: wrap;
-        }
-
-        .partner {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-dim);
-            font-size: 0.85rem;
-            font-weight: 500;
-            opacity: 0.6;
-        }
-
-        .partner-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 6px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-        }
-
-        /* ── SECTION ── */
-        .section {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 100px 2rem;
-        }
-
-        .section-label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 16px;
-        }
-
-        .section h2 {
-            font-size: clamp(1.8rem, 4vw, 2.8rem);
-            font-weight: 800;
-            line-height: 1.2;
-            margin-bottom: 16px;
-            letter-spacing: -0.02em;
-        }
-
-        .section-desc {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            max-width: 600px;
-            line-height: 1.7;
-            margin-bottom: 48px;
-        }
-
-        /* ── HOW IT WORKS ── */
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
-        }
-
-        .step {
-            padding: 32px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            background: var(--bg-card);
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .step:hover {
-            border-color: #333;
-            background: var(--bg-card-hover);
-        }
-
-        .step-number {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: var(--gradient-1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 0.85rem;
-            margin-bottom: 16px;
-        }
-
-        .step h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .step p {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        /* ── FEATURE CARDS ── */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-
-        .feature-card {
-            padding: 32px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            background: var(--bg-card);
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-
-        .feature-card:hover {
-            border-color: var(--accent);
-            background: var(--accent-glow);
-            transform: translateY(-2px);
-        }
-
-        .feature-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: var(--gradient-1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            margin-bottom: 16px;
-        }
-
-        .feature-card h3 {
-            font-size: 1.05rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .feature-card p {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        /* ── TERMINAL ── */
-        .terminal-section {
-            background: var(--bg-card);
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            padding: 80px 2rem;
-        }
-
-        .terminal {
-            max-width: 700px;
-            margin: 0 auto;
-            background: #0d0d0d;
-            border-radius: 16px;
-            border: 1px solid #222;
-            overflow: hidden;
-        }
-
-        .terminal-header {
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border-bottom: 1px solid #1a1a1a;
-        }
-
-        .terminal-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-
-        .terminal-dot.red { background: #ff5f57; }
-        .terminal-dot.yellow { background: #febc2e; }
-        .terminal-dot.green { background: #28c840; }
-
-        .terminal-title {
-            font-size: 0.75rem;
-            color: var(--text-dim);
-            margin-left: 8px;
-        }
-
-        .terminal-body {
-            padding: 24px;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            font-size: 0.8rem;
-            line-height: 2;
-        }
-
-        .terminal-line {
-            display: flex;
-            gap: 8px;
-        }
-
-        .terminal-prompt {
-            color: var(--accent-light);
-            user-select: none;
-        }
-
-        .terminal-cmd {
-            color: var(--text);
-        }
-
-        .terminal-response {
-            color: var(--green);
-            padding-left: 20px;
-        }
-
-        .terminal-dim {
-            color: var(--text-dim);
-        }
-
-        /* ── SECTIONS GRID ── */
-        .sections-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
-        }
-
-        .section-card {
-            padding: 40px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            background: var(--bg-card);
-            transition: all 0.3s;
-        }
-
-        .section-card:hover {
-            border-color: #333;
-        }
-
-        .section-tag {
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 12px;
-        }
-
-        .section-card h3 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        .section-card p {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            line-height: 1.7;
-        }
-
-        /* ── SECURITY ── */
-        .security-items {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
-        }
-
-        .security-item {
-            padding: 32px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            background: var(--bg-card);
-            display: flex;
-            gap: 20px;
-        }
-
-        .security-num {
-            width: 40px;
-            height: 40px;
-            min-width: 40px;
-            border-radius: 10px;
-            background: var(--gradient-1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 0.9rem;
-        }
-
-        .security-item h3 {
-            font-size: 1rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .security-item p {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        /* ── TOKEN ── */
-        .token-section {
-            text-align: center;
-            padding: 100px 2rem;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .token-badge {
-            display: inline-block;
-            padding: 8px 20px;
-            border-radius: 100px;
-            background: var(--gradient-1);
-            font-weight: 700;
-            font-size: 0.9rem;
-            margin-bottom: 24px;
-        }
-
-        .token-section h2 {
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            font-weight: 900;
-            margin-bottom: 16px;
-        }
-
-        .token-desc {
-            color: var(--text-secondary);
-            font-size: 1rem;
-            margin-bottom: 32px;
-            line-height: 1.7;
-        }
-
-        /* ── ROADMAP ── */
-        .roadmap {
-            display: grid;
-            gap: 0;
-        }
-
-        .roadmap-item {
-            display: flex;
-            gap: 24px;
-            padding: 32px 0;
-            border-bottom: 1px solid var(--border);
-            position: relative;
-        }
-
-        .roadmap-phase {
-            min-width: 100px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--accent);
-            padding-top: 2px;
-        }
-
-        .roadmap-content h3 {
-            font-size: 1.05rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .roadmap-content p {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        .roadmap-status {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 100px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            margin-top: 8px;
-        }
-
-        .status-done { background: rgba(34,197,94,0.15); color: var(--green); }
-        .status-progress { background: rgba(234,179,8,0.15); color: var(--yellow); }
-        .status-planned { background: rgba(136,136,136,0.15); color: var(--text-dim); }
-
-        /* ── FOOTER ── */
-        footer {
-            border-top: 1px solid var(--border);
-            padding: 60px 2rem 40px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
-        .footer-brand p {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            margin-top: 12px;
-            line-height: 1.6;
-        }
-
-        .footer-col h4 {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: 16px;
-        }
-
-        .footer-col a {
-            display: block;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.85rem;
-            margin-bottom: 10px;
-            transition: color 0.2s;
-        }
-
-        .footer-col a:hover { color: var(--text); }
-
-        .footer-bottom {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 24px;
-            border-top: 1px solid var(--border);
-            font-size: 0.8rem;
-            color: var(--text-dim);
-        }
-
-        .footer-socials {
-            display: flex;
-            gap: 16px;
-        }
-
-        .footer-socials a {
-            color: var(--text-dim);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .footer-socials a:hover { color: var(--text); }
-
-        /* ── GLOW EFFECTS ── */
-        .glow-orb {
-            position: fixed;
-            width: 400px;
-            height: 400px;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.08;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .glow-1 {
-            top: -100px;
-            left: 20%;
-            background: #6366f1;
-        }
-
-        .glow-2 {
-            top: 50%;
-            right: -100px;
-            background: #8b5cf6;
-        }
-
-        .glow-3 {
-            bottom: -100px;
-            left: 30%;
-            background: #a855f7;
-        }
-
-        /* ── RESPONSIVE ── */
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .stats-bar { gap: 30px; flex-wrap: wrap; }
-            .steps { grid-template-columns: 1fr; }
-            .features-grid { grid-template-columns: 1fr; }
-            .sections-grid { grid-template-columns: 1fr; }
-            .security-items { grid-template-columns: 1fr; }
-            .footer-grid { grid-template-columns: 1fr 1fr; }
-            .hero-buttons { flex-direction: column; align-items: center; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitBlock — Decentralized AI Inference Network</title>
+<link rel="icon" href="assets/gitblock.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#ffffff;--blue:#2563eb;--blue-light:#3b82f6;--blue-dark:#1d4ed8;--blue-glow:rgba(37,99,235,0.08);--card:rgba(37,99,235,0.04);--border:rgba(37,99,235,0.12);--text:#1e293b;--text-secondary:#64748b;--radius:16px;--max:1200px}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(37,99,235,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(37,99,235,0.06) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
+a{text-decoration:none;color:inherit}
+img{max-width:100%;height:auto}
+.container{max-width:var(--max);margin:0 auto;padding:0 24px;position:relative;z-index:1}
+.gradient-text{background:linear-gradient(135deg,#2563eb 0%,#3b82f6 50%,#60a5fa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stroke-text{-webkit-text-stroke:1px rgba(0,0,0,0.15);color:#fff}
+.section-title{text-align:center;margin-bottom:60px}
+.section-title h2{font-size:clamp(2rem,4vw,2.75rem);margin-bottom:16px;font-weight:700;color:var(--text)}
+.section-title p{color:var(--text-secondary);font-size:1.1rem;max-width:600px;margin:0 auto}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ── HEADER ── */
+.header{position:fixed;top:0;left:0;right:0;z-index:1000;padding:16px 0;background:rgba(255,255,255,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);transition:padding .3s}
+.header.scrolled{padding:10px 0}
+.header .container{display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;font-size:1.4rem;font-weight:700;color:var(--blue)}
+.logo img{width:36px;height:36px;border-radius:8px}
+.nav{display:flex;align-items:center;gap:32px}
+.nav a{font-size:.95rem;color:var(--text-secondary);transition:color .2s;font-weight:500}
+.nav a:hover{color:var(--blue)}
+.hamburger{display:none;background:none;border:none;color:var(--blue);font-size:1.5rem;cursor:pointer}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--blue);color:#fff;border:1px solid var(--blue);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-primary:hover{transform:translateY(-2px);background:var(--blue-dark);box-shadow:0 0 20px rgba(37,99,235,0.3)}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:transparent;color:var(--blue);border:1px solid var(--border);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-ghost:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 0 20px rgba(37,99,235,0.1)}
+.btn-sm{padding:10px 20px;font-size:.85rem}
+.mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);flex-direction:column;align-items:center;justify-content:center;gap:28px;z-index:999}
+.mobile-menu.open{display:flex}
+.mobile-menu a{font-size:1.3rem;color:var(--text);font-weight:500}
+.mobile-close{position:absolute;top:20px;right:24px;background:none;border:none;color:var(--text);font-size:2rem;cursor:pointer}
+@media(max-width:768px){.nav{display:none}.hamburger{display:block}}
+
+/* ── HERO ── */
+.hero{position:relative;padding:180px 0 120px;text-align:center;min-height:100vh;display:flex;align-items:center;overflow:hidden}
+.hero::before{content:'';position:absolute;top:50%;left:50%;width:600px;height:600px;background:radial-gradient(circle,rgba(37,99,235,0.08) 0%,transparent 70%);transform:translate(-50%,-50%);pointer-events:none}
+.hero-content{position:relative;z-index:2;max-width:800px;margin:0 auto}
+.hero-subtitle{font-size:.85rem;font-weight:600;letter-spacing:4px;color:var(--blue);margin-bottom:20px;text-transform:uppercase}
+.hero h1{font-size:clamp(2.5rem,6vw,4.5rem);font-weight:800;margin-bottom:24px;letter-spacing:-1px;color:var(--text)}
+.hero-desc{font-size:1.15rem;color:var(--text-secondary);max-width:600px;margin:0 auto 36px;line-height:1.7}
+.hero-buttons{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:60px}
+.stats-row{display:flex;justify-content:center;gap:48px;flex-wrap:wrap}
+.stat{text-align:center}
+.stat-number{font-size:2.5rem;font-weight:700;color:var(--blue)}
+.stat-label{font-size:.9rem;color:var(--text-secondary);margin-top:4px}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;transition:transform .3s,border-color .3s,box-shadow .3s}
+.card:hover{transform:translateY(-4px);border-color:rgba(37,99,235,0.25);box-shadow:0 20px 60px rgba(37,99,235,0.08)}
+
+/* ── FEATURES ── */
+.features{padding:100px 0;position:relative;z-index:2}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.feature-icon{width:52px;height:52px;border-radius:14px;background:var(--blue-glow);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:20px;color:var(--blue)}
+.card h3{font-size:1.15rem;margin-bottom:10px;font-weight:700;color:var(--text)}
+.card p{color:var(--text-secondary);font-size:.95rem;line-height:1.6}
+@media(max-width:768px){.features-grid{grid-template-columns:1fr}}
+
+/* ── RESILIENCE ── */
+.resilience{padding:100px 0;position:relative;z-index:2}
+.resilience-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.resilience-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:36px;display:flex;gap:20px;transition:transform .3s,border-color .3s}
+.resilience-card:hover{transform:translateY(-4px);border-color:rgba(37,99,235,0.25)}
+.resilience-num{width:44px;height:44px;min-width:44px;border-radius:12px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem}
+.resilience-card h3{font-size:1.1rem;margin-bottom:8px;font-weight:700;color:var(--text)}
+.resilience-card p{color:var(--text-secondary);font-size:.9rem;line-height:1.6}
+@media(max-width:768px){.resilience-grid{grid-template-columns:1fr}}
+
+/* ── QUICK START ── */
+.quick-start{padding:100px 0;position:relative;z-index:2}
+.paths-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.path-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:36px;text-align:center;transition:transform .3s,border-color .3s}
+.path-card:hover{transform:translateY(-4px);border-color:rgba(37,99,235,0.25)}
+.path-icon{width:60px;height:60px;border-radius:16px;background:var(--blue-glow);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 20px;color:var(--blue)}
+.path-card h3{font-size:1.15rem;margin-bottom:10px;font-weight:700;color:var(--text)}
+.path-card p{color:var(--text-secondary);font-size:.9rem;line-height:1.6;margin-bottom:16px}
+.code-block{background:#f1f5f9;border:1px solid var(--border);border-radius:12px;padding:20px;text-align:left;font-family:'SF Mono','Fira Code',monospace;font-size:.8rem;line-height:1.8;color:var(--text);overflow-x:auto}
+.code-comment{color:var(--text-secondary)}
+.code-cmd{color:var(--blue);font-weight:600}
+@media(max-width:768px){.paths-grid{grid-template-columns:1fr}}
+
+/* ── PROVIDERS ── */
+.providers{padding:100px 0;position:relative;z-index:2}
+.providers-logos{display:flex;justify-content:center;align-items:center;gap:40px;flex-wrap:wrap;margin-top:40px}
+.provider-logo{display:flex;align-items:center;gap:8px;padding:12px 20px;border-radius:12px;background:var(--card);border:1px solid var(--border);font-weight:600;color:var(--text);font-size:.9rem;transition:all .2s}
+.provider-logo:hover{border-color:var(--blue);transform:translateY(-2px)}
+.provider-logo i{color:var(--blue);font-size:1.1rem}
+
+/* ── API GUIDE ── */
+.api-guide{padding:100px 0;position:relative;z-index:2}
+.api-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.api-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:transform .3s,border-color .3s}
+.api-card:hover{transform:translateY(-4px);border-color:rgba(37,99,235,0.25)}
+.api-card-header{padding:24px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.api-card-header i{color:var(--blue);font-size:1.2rem}
+.api-card-header h3{font-size:1.05rem;font-weight:700;color:var(--text)}
+.api-card-body{padding:24px 28px}
+.api-card-body p{color:var(--text-secondary);font-size:.9rem;line-height:1.6;margin-bottom:16px}
+.endpoint{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f1f5f9;border-radius:8px;font-family:'SF Mono','Fira Code',monospace;font-size:.8rem;margin-bottom:12px}
+.method{padding:2px 8px;border-radius:4px;font-weight:700;font-size:.7rem;text-transform:uppercase}
+.method-get{background:rgba(34,197,94,0.15);color:#16a34a}
+.method-post{background:rgba(37,99,235,0.15);color:var(--blue)}
+@media(max-width:768px){.api-grid{grid-template-columns:1fr}}
+
+/* ── TUTORIALS ── */
+.tutorials{padding:100px 0;position:relative;z-index:2}
+.tutorial-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.tutorial-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;transition:transform .3s,border-color .3s}
+.tutorial-card:hover{transform:translateY(-4px);border-color:rgba(37,99,235,0.25)}
+.tutorial-step{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.tutorial-num{width:32px;height:32px;border-radius:8px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem}
+.tutorial-card h3{font-size:1.05rem;font-weight:700;color:var(--text)}
+.tutorial-card p{color:var(--text-secondary);font-size:.9rem;line-height:1.6;margin-bottom:16px}
+.tutorial-code{background:#f1f5f9;border:1px solid var(--border);border-radius:12px;padding:16px;font-family:'SF Mono','Fira Code',monospace;font-size:.78rem;line-height:1.8;color:var(--text);overflow-x:auto}
+@media(max-width:768px){.tutorial-grid{grid-template-columns:1fr}}
+
+/* ── BENEFITS ── */
+.benefits{padding:100px 0;position:relative;z-index:2}
+.benefits-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.benefit-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;text-align:center;transition:transform .3s,border-color .3s}
+.benefit-card:hover{transform:translateY(-4px);border-color:rgba(37,99,235,0.25)}
+.benefit-icon{width:56px;height:56px;border-radius:14px;background:var(--blue-glow);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 16px;color:var(--blue)}
+.benefit-card h3{font-size:1.1rem;margin-bottom:8px;font-weight:700;color:var(--text)}
+.benefit-card p{color:var(--text-secondary);font-size:.9rem;line-height:1.6}
+@media(max-width:768px){.benefits-grid{grid-template-columns:1fr}}
+
+/* ── FAQ ── */
+.faq{padding:100px 0;position:relative;z-index:2}
+.faq-list{max-width:800px;margin:0 auto}
+.faq-item{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;background:var(--card);cursor:pointer;transition:border-color .3s}
+.faq-item:hover{border-color:rgba(37,99,235,0.25)}
+.faq-question{padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.faq-question h3{font-size:1rem;font-weight:600;color:var(--text)}
+.faq-question i{color:var(--blue);transition:transform .3s;font-size:.85rem}
+.faq-item.open .faq-question i{transform:rotate(180deg)}
+.faq-answer{padding:0 24px;max-height:0;overflow:hidden;transition:padding .3s,max-height .3s}
+.faq-item.open .faq-answer{padding:0 24px 20px;max-height:300px}
+.faq-answer p{color:var(--text-secondary);font-size:.9rem;line-height:1.7}
+
+/* ── DONATE ── */
+.donate{padding:100px 0;position:relative;z-index:2;text-align:center}
+.donate-box{max-width:500px;margin:0 auto;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:36px}
+.donate-box h3{font-size:1.3rem;margin-bottom:12px;font-weight:700;color:var(--text)}
+.donate-box p{color:var(--text-secondary);font-size:.9rem;margin-bottom:20px;line-height:1.6}
+.wallet-address{display:flex;align-items:center;gap:8px;padding:12px 16px;background:#f1f5f9;border:1px solid var(--border);border-radius:10px;font-family:'SF Mono','Fira Code',monospace;font-size:.8rem;color:var(--text);word-break:break-all}
+.copy-btn{padding:6px 14px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.copy-btn:hover{background:var(--blue-dark)}
+
+/* ── FOOTER ── */
+.footer{padding:60px 0 30px;border-top:1px solid var(--border);position:relative;z-index:2}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
+.footer-brand p{color:var(--text-secondary);font-size:.85rem;margin-top:12px;line-height:1.6;max-width:300px}
+.footer-col h4{font-size:.8rem;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px}
+.footer-col a{display:block;color:var(--text-secondary);font-size:.85rem;margin-bottom:10px;transition:color .2s}
+.footer-col a:hover{color:var(--blue)}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:24px;border-top:1px solid var(--border);font-size:.8rem;color:var(--text-secondary)}
+.footer-socials{display:flex;gap:16px}
+.footer-socials a{color:var(--text-secondary);font-size:1.1rem;transition:color .2s}
+.footer-socials a:hover{color:var(--blue)}
+@media(max-width:768px){.footer-grid{grid-template-columns:1fr 1fr}.footer-bottom{flex-direction:column;gap:12px}}
+</style>
 </head>
 <body>
 
-<div class="glow-orb glow-1"></div>
-<div class="glow-orb glow-2"></div>
-<div class="glow-orb glow-3"></div>
-
-<!-- NAV -->
-<nav>
-    <a href="#" class="nav-logo">
-        <div class="logo-icon">GB</div>
-        GitBlock
-    </a>
-    <div class="nav-links">
-        <a href="#protocol">Protocol</a>
+<!-- HEADER -->
+<header class="header">
+<div class="container">
+    <a href="#" class="logo"><img src="assets/gitblock.jpg" alt="GitBlock"> GitBlock</a>
+    <nav class="nav">
         <a href="#features">Features</a>
-        <a href="#security">Security</a>
-        <a href="#token">$GBLOCK</a>
-        <a href="#roadmap">Roadmap</a>
-    </div>
-    <div class="nav-cta">
-        <a href="https://github.com/askexort/gitblock" class="btn btn-ghost">GitHub</a>
-        <a href="#ecosystem" class="btn btn-primary">Launch App</a>
-    </div>
-</nav>
+        <a href="#api">API</a>
+        <a href="#quick-start">Quick Start</a>
+        <a href="#providers">Providers</a>
+        <a href="#faq">FAQ</a>
+        <a href="https://github.com/Gitblock17/Gitblock" class="btn-ghost btn-sm"><i class="fab fa-github"></i> GitHub</a>
+        <a href="#quick-start" class="btn-primary btn-sm">Get Started</a>
+    </nav>
+    <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.add('open')"><i class="fas fa-bars"></i></button>
+</div>
+</header>
+
+<div class="mobile-menu">
+    <button class="mobile-close" onclick="this.parentElement.classList.remove('open')"><i class="fas fa-times"></i></button>
+    <a href="#features" onclick="this.parentElement.classList.remove('open')">Features</a>
+    <a href="#api" onclick="this.parentElement.classList.remove('open')">API</a>
+    <a href="#quick-start" onclick="this.parentElement.classList.remove('open')">Quick Start</a>
+    <a href="#providers" onclick="this.parentElement.classList.remove('open')">Providers</a>
+    <a href="#faq" onclick="this.parentElement.classList.remove('open')">FAQ</a>
+    <a href="https://github.com/Gitblock17/Gitblock">GitHub</a>
+</div>
 
 <!-- HERO -->
 <section class="hero">
-    <div class="hero-badge">
-        <span class="dot"></span>
-        Open Source &middot; Decentralized &middot; Free for Everyone
-    </div>
-    <h1>
-        Free AI for everyone.<br>
-        <span class="gradient-text">Powered by the community.</span>
-    </h1>
-    <p class="hero-desc">
-        GitBlock is a decentralized AI inference network where anyone can run open-source models
-        and earn tokens. Users get free AI. Node operators earn by serving models.
-        No paywalls. No gatekeepers. Just open intelligence.
-    </p>
-    <div class="hero-features">
-        <span class="hero-feature">⚡ Free AI Inference</span>
-        <span class="hero-feature">🔗 On-Chain Rewards</span>
-        <span class="hero-feature">🧠 Open Source Models</span>
-        <span class="hero-feature">🌍 For Everyone</span>
-        <span class="hero-feature">💰 $0 Cost</span>
-    </div>
-    <div class="hero-buttons">
-        <a href="#ecosystem" class="btn btn-primary btn-large">Explore Ecosystem</a>
-        <a href="https://github.com/askexort/gitblock" class="btn btn-ghost btn-large">Read Docs</a>
-    </div>
-    <div class="stats-bar">
-        <div class="stat">
-            <div class="stat-number">12,847</div>
-            <div class="stat-label">Inference Requests</div>
+<div class="container">
+    <div class="hero-content">
+        <div class="hero-subtitle">DECENTRALIZED AI INFERENCE</div>
+        <h1><span class="gradient-text">Free AI for Everyone</span></h1>
+        <p class="hero-desc">GitBlock is a decentralized AI inference network where anyone can access open-source models for free. No API keys. No paywalls. Community-powered intelligence.</p>
+        <div class="hero-buttons">
+            <a href="#quick-start" class="btn-primary"><i class="fas fa-rocket"></i> Try GitBlock</a>
+            <a href="https://github.com/Gitblock17/Gitblock" class="btn-ghost"><i class="fab fa-github"></i> GitHub</a>
         </div>
-        <div class="stat">
-            <div class="stat-number">342</div>
-            <div class="stat-label">Active Nodes</div>
-        </div>
-        <div class="stat">
-            <div class="stat-number">89</div>
-            <div class="stat-label">Models Available</div>
-        </div>
-        <div class="stat">
-            <div class="stat-number">5,201</div>
-            <div class="stat-label">Users</div>
+        <div class="stats-row">
+            <div class="stat"><div class="stat-number">12,847</div><div class="stat-label">Inference Requests</div></div>
+            <div class="stat"><div class="stat-number">342</div><div class="stat-label">Active Nodes</div></div>
+            <div class="stat"><div class="stat-number">89</div><div class="stat-label">Models Available</div></div>
+            <div class="stat"><div class="stat-number">5,201</div><div class="stat-label">Users</div></div>
         </div>
     </div>
-</section>
-
-<!-- PARTNERS -->
-<div class="partners">
-    <div class="partner"><div class="partner-icon">B</div> Base</div>
-    <div class="partner"><div class="partner-icon">L</div> Llama</div>
-    <div class="partner"><div class="partner-icon">M</div> Mistral</div>
-    <div class="partner"><div class="partner-icon">G</div> Groq</div>
-    <div class="partner"><div class="partner-icon">C</div> Cerebras</div>
-    <div class="partner"><div class="partner-icon">O</div> OpenRouter</div>
-    <div class="partner"><div class="partner-icon">S</div> Solana</div>
 </div>
-
-<!-- PROTOCOL -->
-<section class="section" id="protocol">
-    <div class="section-label">PROTOCOL</div>
-    <h2>How it works</h2>
-    <p class="section-desc">
-        GitBlock runs on one principle: AI inference should be free, decentralized, and owned by
-        the community. No central server. No API keys. Just open models running on distributed nodes.
-    </p>
-    <div class="steps">
-        <div class="step">
-            <div class="step-number">1</div>
-            <h3>Node operators register</h3>
-            <p>Anyone with a GPU can run a GitBlock node. Install the software, register on-chain,
-            and start serving open-source models like Llama, Mistral, and Gemma.</p>
-        </div>
-        <div class="step">
-            <div class="step-number">2</div>
-            <h3>Users send prompts</h3>
-            <p>Users send questions through the web app, Telegram bot, or API. The network routes
-            the request to the best available node based on speed, reliability, and model availability.</p>
-        </div>
-        <div class="step">
-            <div class="step-number">3</div>
-            <h3>Inference happens on-chain</h3>
-            <p>Every inference request is recorded on-chain. The node serves the response, the quality
-            is scored, and the interaction is permanently logged for transparency.</p>
-        </div>
-        <div class="step">
-            <div class="step-number">4</div>
-            <h3>Tokens reward contributors</h3>
-            <p>Node operators earn $GBLOCK tokens for serving quality inference. Reputation scores
-            determine traffic distribution. Good nodes earn more. Bad nodes get deprioritized.</p>
-        </div>
-    </div>
 </section>
 
 <!-- FEATURES -->
-<section class="section" id="features">
-    <div class="section-label">EXPLORE</div>
-    <h2>Platform sections</h2>
-    <p class="section-desc">
-        Everything you need to access decentralized AI, contribute compute, and participate
-        in the network governance.
-    </p>
-    <div class="features-grid">
-        <div class="feature-card">
-            <div class="feature-icon">🧠</div>
-            <h3>Free Inference</h3>
-            <p>Access Llama, Mistral, Gemma and 80+ open-source models completely free. No API keys, no paywalls, no rate limits for basic usage.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">⚡</div>
-            <h3>Node Network</h3>
-            <p>Run a node on your hardware and earn $GBLOCK tokens. Any GPU works — from gaming PCs to data center rigs. More power = more rewards.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">📊</div>
-            <h3>Reputation System</h3>
-            <p>On-chain reputation scores for every node. Speed, uptime, quality, and consistency determine your ranking and reward multiplier.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">🗳️</div>
-            <h3>Governance</h3>
-            <p>$GBLOCK holders vote on network decisions — which models to add, fee structures, reward rates, and protocol upgrades.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">🔒</div>
-            <h3>Privacy Layer</h3>
-            <p>End-to-end encrypted inference. Your prompts never leave the node unencrypted. Zero-knowledge proofs verify quality without exposing data.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">🌐</div>
-            <h3>Multi-Chain</h3>
-            <p>Deploy on Base, Solana, or any EVM chain. Cross-chain rewards, unified reputation, one network across all blockchains.</p>
-        </div>
+<section class="features" id="features">
+<div class="container">
+    <div class="section-title reveal">
+        <h2>AI Solutions for Every Developer</h2>
+        <p>Everything you need to access free, decentralized AI inference</p>
     </div>
-</section>
-
-<!-- TERMINAL DEMO -->
-<div class="terminal-section">
-    <div class="terminal">
-        <div class="terminal-header">
-            <div class="terminal-dot red"></div>
-            <div class="terminal-dot yellow"></div>
-            <div class="terminal-dot green"></div>
-            <span class="terminal-title">gitblock — terminal</span>
+    <div class="features-grid">
+        <div class="card reveal">
+            <div class="feature-icon"><i class="fas fa-brain"></i></div>
+            <h3>Free AI Inference</h3>
+            <p>Access 80+ open-source models including Llama, Mistral, Gemma, and DeepSeek completely free. No API keys required.</p>
         </div>
-        <div class="terminal-body">
-            <div class="terminal-line">
-                <span class="terminal-prompt">❯</span>
-                <span class="terminal-cmd">gitblock ask "explain quantum computing"</span>
-            </div>
-            <div class="terminal-response">✓ Routed to node #47 (Llama 3.3 70B) — 142ms</div>
-            <br>
-            <div class="terminal-response">Quantum computing uses quantum bits (qubits) that can</div>
-            <div class="terminal-response">exist in multiple states simultaneously through</div>
-            <div class="terminal-response">superposition and entanglement, enabling exponential</div>
-            <div class="terminal-response">parallel processing for certain problem classes.</div>
-            <br>
-            <div class="terminal-dim">Tokens: 87 in / 64 out | Cost: free | Node reputation: 98.2</div>
-            <br>
-            <div class="terminal-line">
-                <span class="terminal-prompt">❯</span>
-                <span class="terminal-cmd">gitblock node status</span>
-            </div>
-            <br>
-            <div class="terminal-dim">Node ID:     0x7a3f...9e2b</div>
-            <div class="terminal-dim">Model:       llama-3.3-70b-versatile</div>
-            <div class="terminal-dim">Uptime:      99.7%</div>
-            <div class="terminal-dim">Requests:    1,247 today</div>
-            <div class="terminal-dim">Reputation:  ★ 96.4 / 100</div>
-            <div class="terminal-response">Earnings:    12.8 $GBLOCK (24h)</div>
+        <div class="card reveal">
+            <div class="feature-icon"><i class="fas fa-server"></i></div>
+            <h3>Decentralized Nodes</h3>
+            <p>Inference runs on a distributed network of community nodes. No single point of failure. Always available.</p>
+        </div>
+        <div class="card reveal">
+            <div class="feature-icon"><i class="fas fa-plug"></i></div>
+            <h3>OpenAI Compatible API</h3>
+            <p>Drop-in replacement for OpenAI API. Switch from centralized to decentralized AI with one line of code.</p>
+        </div>
+        <div class="card reveal">
+            <div class="feature-icon"><i class="fas fa-shield-halved"></i></div>
+            <h3>End-to-End Encrypted</h3>
+            <p>Your prompts are encrypted client-side. Decrypted only on the serving node. No one else sees your data.</p>
+        </div>
+        <div class="card reveal">
+            <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+            <h3>Fast Response Times</h3>
+            <p>Smart routing finds the fastest available node. Average response time under 200ms for most models.</p>
+        </div>
+        <div class="card reveal">
+            <div class="feature-icon"><i class="fas fa-code-branch"></i></div>
+            <h3>Open Source</h3>
+            <p>MIT licensed. Fork it, improve it, deploy your own network. Community driven development.</p>
         </div>
     </div>
 </div>
-
-<!-- SECTIONS -->
-<section class="section" id="ecosystem">
-    <div class="section-label">ECOSYSTEM</div>
-    <h2>Built for the community</h2>
-    <p class="section-desc">
-        Every component is open source. Fork it, improve it, deploy your own network.
-    </p>
-    <div class="sections-grid">
-        <div class="section-card">
-            <div class="section-tag">INFERENCE</div>
-            <h3>Free AI Access</h3>
-            <p>Access 80+ open-source models through a single API. Llama, Mistral, Gemma, DeepSeek, Qwen — all free, all decentralized, all community-powered.</p>
-        </div>
-        <div class="section-card">
-            <div class="section-tag">NODES</div>
-            <h3>Earn by Computing</h3>
-            <p>Run inference on your hardware and earn $GBLOCK tokens. The network rewards quality, speed, and uptime. Start with a single GPU, scale to a farm.</p>
-        </div>
-        <div class="section-card">
-            <div class="section-tag">TOKEN</div>
-            <h3>$GBLOCK Economy</h3>
-            <p>Utility token for governance, staking, and rewards. Node operators stake tokens as collateral. Users spend tokens for priority access. Holders vote on protocol.</p>
-        </div>
-        <div class="section-card">
-            <div class="section-tag">TOOLS</div>
-            <h3>Developer SDK</h3>
-            <p>Python, JavaScript, and Rust SDKs. Drop-in replacement for OpenAI API. One line of code to switch from centralized to decentralized AI.</p>
-        </div>
-    </div>
 </section>
 
-<!-- SECURITY -->
-<section class="section" id="security">
-    <div class="section-label">SECURITY</div>
-    <h2>Trustless by design. Cryptographically verifiable.</h2>
-    <p class="section-desc">
-        Every inference is on-chain verifiable. Node reputation is immutable. Quality is provable.
-    </p>
-    <div class="security-items">
-        <div class="security-item">
-            <div class="security-num">01</div>
+<!-- RESILIENCE -->
+<section class="resilience" id="resilience">
+<div class="container">
+    <div class="section-title reveal">
+        <h2>Self-Healing Node Network</h2>
+        <p>How It Works — never go offline, never lose a request</p>
+    </div>
+    <div class="resilience-grid">
+        <div class="resilience-card reveal">
+            <div class="resilience-num">01</div>
             <div>
-                <h3>On-chain proof of inference</h3>
-                <p>Every inference request and response is hashed and recorded on-chain. Users can verify their AI responses were served by legitimate nodes.</p>
+                <h3>Multi-Node Routing</h3>
+                <p>Requests are routed to the best available node based on speed, reputation, and model availability. If one node goes down, traffic shifts instantly.</p>
             </div>
         </div>
-        <div class="security-item">
-            <div class="security-num">02</div>
+        <div class="resilience-card reveal">
+            <div class="resilience-num">02</div>
             <div>
-                <h3>Stake-slashed quality</h3>
-                <p>Nodes stake $GBLOCK tokens as collateral. Serving bad responses, going offline, or manipulating results triggers automatic slashing.</p>
+                <h3>Reputation Scoring</h3>
+                <p>Every node has an on-chain reputation score based on uptime, speed, and response quality. High-reputation nodes get more traffic and rewards.</p>
             </div>
         </div>
-        <div class="security-item">
-            <div class="security-num">03</div>
+        <div class="resilience-card reveal">
+            <div class="resilience-num">03</div>
             <div>
-                <h3>Zero-knowledge verification</h3>
-                <p>ZK proofs verify model quality without exposing user prompts. Privacy-preserving quality assurance at the protocol level.</p>
+                <h3>Quality Verification</h3>
+                <p>Responses are verified against quality benchmarks. Nodes serving bad responses get penalized. Users always get reliable output.</p>
             </div>
         </div>
-        <div class="security-item">
-            <div class="security-num">04</div>
+        <div class="resilience-card reveal">
+            <div class="resilience-num">04</div>
             <div>
-                <h3>Decrypted end-to-end</h3>
-                <p>Prompts are encrypted client-side, decrypted only on the serving node. No central server ever sees your data. Not even us.</p>
+                <h3>Health Dashboard</h3>
+                <p>Real-time monitoring of all nodes, models, and network health. Transparent metrics anyone can verify.</p>
             </div>
         </div>
     </div>
+</div>
 </section>
 
-<!-- TOKEN -->
-<section class="token-section" id="token">
-    <div class="token-badge">$GBLOCK</div>
-    <h2>The token that powers<br>decentralized AI</h2>
-    <p class="token-desc">
-        $GBLOCK is the utility token of the GitBlock network. Node operators earn it.
-        Users stake it for priority. Holders govern with it. No presale. No VC allocation.
-        100% community distributed.
-    </p>
-    <div class="stats-bar" style="border: none; padding: 20px 0;">
-        <div class="stat">
-            <div class="stat-number">1B</div>
-            <div class="stat-label">Total Supply</div>
+<!-- API GUIDE -->
+<section class="api-guide" id="api">
+<div class="container">
+    <div class="section-title reveal">
+        <h2>How to Get API Access</h2>
+        <p>Start using GitBlock in minutes — no credit card, no signup</p>
+    </div>
+    <div class="api-grid">
+        <div class="api-card reveal">
+            <div class="api-card-header">
+                <i class="fas fa-key"></i>
+                <h3>Get Your Free API Key</h3>
+            </div>
+            <div class="api-card-body">
+                <p>Get a free API key instantly. No email, no credit card, no verification. Just generate and use.</p>
+                <div class="endpoint">
+                    <span class="method method-post">POST</span>
+                    <span>/api/v1/keys/generate</span>
+                </div>
+                <div class="tutorial-code">
+<span class="code-comment"># Generate a free API key</span>
+curl -X POST https://api.gitblock.io/v1/keys/generate
+
+<span class="code-comment"># Response:</span>
+{
+  "key": "gb_free_xxxxxxxxxxxx",
+  "rate_limit": "100 req/min",
+  "models": "all"
+}
+                </div>
+            </div>
         </div>
-        <div class="stat">
-            <div class="stat-number">0%</div>
-            <div class="stat-label">VC Allocation</div>
+        <div class="api-card reveal">
+            <div class="api-card-header">
+                <i class="fas fa-terminal"></i>
+                <h3>Use the CLI</h3>
+            </div>
+            <div class="api-card-body">
+                <p>Install the CLI and start asking questions immediately. No configuration needed.</p>
+                <div class="endpoint">
+                    <span class="method method-get">CLI</span>
+                    <span>pip install gitblock</span>
+                </div>
+                <div class="tutorial-code">
+<span class="code-comment"># Install</span>
+pip install gitblock
+
+<span class="code-comment"># Ask a question</span>
+gitblock ask "explain quantum computing"
+
+<span class="code-comment"># Start chat session</span>
+gitblock chat
+
+<span class="code-comment"># List available models</span>
+gitblock models
+                </div>
+            </div>
         </div>
-        <div class="stat">
-            <div class="stat-number">80%</div>
-            <div class="stat-label">Community Rewards</div>
+        <div class="api-card reveal">
+            <div class="api-card-header">
+                <i class="fas fa-code"></i>
+                <h3>Python SDK</h3>
+            </div>
+            <div class="api-card-body">
+                <p>Use the Python SDK as a drop-in replacement for OpenAI. Same interface, free inference.</p>
+                <div class="endpoint">
+                    <span class="method method-post">SDK</span>
+                    <span>pip install gitblock-sdk</span>
+                </div>
+                <div class="tutorial-code">
+<span class="code-comment"># Install SDK</span>
+pip install gitblock-sdk
+
+<span class="code-comment"># Use like OpenAI</span>
+from gitblock import GitBlock
+
+client = GitBlock(api_key="gb_free_xxx")
+response = client.chat(
+    model="llama-3.3-70b",
+    messages=[{"role": "user",
+               "content": "Hello!"}]
+)
+print(response.content)
+                </div>
+            </div>
         </div>
-        <div class="stat">
-            <div class="stat-number">20%</div>
-            <div class="stat-label">Development</div>
+        <div class="api-card reveal">
+            <div class="api-card-header">
+                <i class="fas fa-globe"></i>
+                <h3>REST API</h3>
+            </div>
+            <div class="api-card-body">
+                <p>Call the API directly from any language. OpenAI-compatible endpoint format.</p>
+                <div class="endpoint">
+                    <span class="method method-post">POST</span>
+                    <span>/v1/chat/completions</span>
+                </div>
+                <div class="tutorial-code">
+<span class="code-comment"># cURL example</span>
+curl https://api.gitblock.io/v1/chat/completions \
+  -H "Authorization: Bearer gb_free_xxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "llama-3.3-70b",
+    "messages": [
+      {"role": "user",
+       "content": "Hello!"}
+    ]
+  }'
+                </div>
+            </div>
         </div>
     </div>
-    <div class="hero-buttons" style="margin-top: 32px;">
-        <a href="#" class="btn btn-primary btn-large">View Tokenomics</a>
-        <a href="#" class="btn btn-ghost btn-large">Whitepaper</a>
-    </div>
+</div>
 </section>
 
-<!-- ROADMAP -->
-<section class="section" id="roadmap">
-    <div class="section-label">ROADMAP</div>
-    <h2>What's coming</h2>
-    <p class="section-desc">
-        Open source development. Community-driven priorities. Transparent progress.
-    </p>
-    <div class="roadmap">
-        <div class="roadmap-item">
-            <div class="roadmap-phase">Phase 1</div>
-            <div class="roadmap-content">
-                <h3>Foundation</h3>
-                <p>Core inference protocol, node software, basic web app, Telegram bot integration, first 10 models live on testnet.</p>
-                <span class="roadmap-status status-done">✓ Completed</span>
+<!-- HOW TO USE -->
+<section class="tutorials" id="tutorials">
+<div class="container">
+    <div class="section-title reveal">
+        <h2>How to Use GitBlock</h2>
+        <p>Step-by-step guides for every use case</p>
+    </div>
+    <div class="tutorial-grid">
+        <div class="tutorial-card reveal">
+            <div class="tutorial-step">
+                <div class="tutorial-num">1</div>
+                <h3>Chat Completion</h3>
+            </div>
+            <p>Send a message and get an AI response. Works exactly like OpenAI's chat completions API.</p>
+            <div class="tutorial-code">
+from gitblock import GitBlock
+
+client = GitBlock()
+response = client.chat(
+    model="llama-3.3-70b",
+    messages=[
+        {"role": "system", "content": "You are helpful."},
+        {"role": "user", "content": "What is Python?"}
+    ],
+    temperature=0.7,
+    max_tokens=500
+)
+print(response.content)
             </div>
         </div>
-        <div class="roadmap-item">
-            <div class="roadmap-phase">Phase 2</div>
-            <div class="roadmap-content">
-                <h3>Token Launch</h3>
-                <p>$GBLOCK token deployment on Base, staking contracts, reputation system, node registration, reward distribution.</p>
-                <span class="roadmap-status status-progress">⏳ In Progress</span>
+        <div class="tutorial-card reveal">
+            <div class="tutorial-step">
+                <div class="tutorial-num">2</div>
+                <h3>Streaming Responses</h3>
+            </div>
+            <p>Get responses as they're generated. Perfect for real-time chat interfaces.</p>
+            <div class="tutorial-code">
+from gitblock import GitBlock
+
+client = GitBlock()
+stream = client.chat(
+    model="mistral-7b",
+    messages=[
+        {"role": "user", "content": "Write a poem"}
+    ],
+    stream=True
+)
+
+for chunk in stream:
+    print(chunk.delta, end="", flush=True)
             </div>
         </div>
-        <div class="roadmap-item">
-            <div class="roadmap-phase">Phase 3</div>
-            <div class="roadmap-content">
-                <h3>Scale</h3>
-                <p>Multi-chain deployment (Solana, Arbitrum), 100+ models, developer SDK, API marketplace, governance DAO.</p>
-                <span class="roadmap-status status-planned">Planned</span>
+        <div class="tutorial-card reveal">
+            <div class="tutorial-step">
+                <div class="tutorial-num">3</div>
+                <h3>Code Generation</h3>
+            </div>
+            <p>Generate code in any language. Use coding-optimized models for best results.</p>
+            <div class="tutorial-code">
+from gitblock import GitBlock
+
+client = GitBlock()
+response = client.chat(
+    model="deepseek-coder-33b",
+    messages=[{
+        "role": "user",
+        "content": "Write a Python function to sort a list"
+    }]
+)
+print(response.content)
             </div>
         </div>
-        <div class="roadmap-item">
-            <div class="roadmap-phase">Phase 4</div>
-            <div class="roadmap-content">
-                <h3>Ecosystem</h3>
-                <p>Custom model training, fine-tuning marketplace, enterprise API, partnerships with protocols, 10K+ active nodes.</p>
-                <span class="roadmap-status status-planned">Planned</span>
+        <div class="tutorial-card reveal">
+            <div class="tutorial-step">
+                <div class="tutorial-num">4</div>
+                <h3>Run a Node</h3>
+            </div>
+            <p>Earn tokens by serving inference on your hardware. Any GPU works.</p>
+            <div class="tutorial-code">
+<span class="code-comment"># Install node software</span>
+pip install gitblock-node
+
+<span class="code-comment"># Register your node</span>
+gitblock-node register --wallet 0xYourAddr
+
+<span class="code-comment"># Start serving</span>
+gitblock-node start --model llama-3.3-70b
+
+<span class="code-comment"># Check status</span>
+gitblock-node status
             </div>
         </div>
     </div>
+</div>
+</section>
+
+<!-- PROVIDERS -->
+<section class="providers" id="providers">
+<div class="container">
+    <div class="section-title reveal">
+        <h2>Works With Free AI Models</h2>
+        <p>All open-source models, all free, all community-powered</p>
+    </div>
+    <div class="providers-logos reveal">
+        <div class="provider-logo"><i class="fas fa-microchip"></i> Llama 3.3</div>
+        <div class="provider-logo"><i class="fas fa-microchip"></i> Mistral 7B</div>
+        <div class="provider-logo"><i class="fas fa-microchip"></i> Gemma 4</div>
+        <div class="provider-logo"><i class="fas fa-microchip"></i> DeepSeek</div>
+        <div class="provider-logo"><i class="fas fa-microchip"></i> Qwen 2.5</div>
+        <div class="provider-logo"><i class="fas fa-microchip"></i> Phi-3</div>
+        <div class="provider-logo"><i class="fas fa-microchip"></i> Yi 1.5</div>
+        <div class="provider-logo"><i class="fas fa-microchip"></i> CodeLlama</div>
+    </div>
+</div>
+</section>
+
+<!-- BENEFITS -->
+<section class="benefits" id="benefits">
+<div class="container">
+    <div class="section-title reveal">
+        <h2>Why Choose GitBlock</h2>
+        <p>Built for developers who want free, fast, and private AI</p>
+    </div>
+    <div class="benefits-grid">
+        <div class="benefit-card reveal">
+            <div class="benefit-icon"><i class="fas fa-dollar-sign"></i></div>
+            <h3>100% Free</h3>
+            <p>No credit card, no subscription, no hidden fees. Free AI inference for everyone, forever.</p>
+        </div>
+        <div class="benefit-card reveal">
+            <div class="benefit-icon"><i class="fas fa-lock"></i></div>
+            <h3>Full Privacy</h3>
+            <p>End-to-end encrypted inference. Your prompts are never stored or seen by anyone except the serving node.</p>
+        </div>
+        <div class="benefit-card reveal">
+            <div class="benefit-icon"><i class="fas fa-clock"></i></div>
+            <h3>24/7 Always On</h3>
+            <p>Decentralized network means no downtime. Nodes across the world keep the network running.</p>
+        </div>
+        <div class="benefit-card reveal">
+            <div class="benefit-icon"><i class="fas fa-globe"></i></div>
+            <h3>Multi-Platform</h3>
+            <p>CLI, Python SDK, JavaScript SDK, REST API, Telegram bot. Use from anywhere.</p>
+        </div>
+        <div class="benefit-card reveal">
+            <div class="benefit-icon"><i class="fas fa-wand-magic-sparkles"></i></div>
+            <h3>Smart Routing</h3>
+            <p>AI automatically routes your request to the fastest, most reliable node available.</p>
+        </div>
+        <div class="benefit-card reveal">
+            <div class="benefit-icon"><i class="fas fa-code"></i></div>
+            <h3>Open Source</h3>
+            <p>MIT licensed. Fork, modify, deploy your own. Community driven development.</p>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+<div class="container">
+    <div class="section-title reveal">
+        <h2>Frequently Asked Questions</h2>
+        <p>Everything you need to know about GitBlock</p>
+    </div>
+    <div class="faq-list">
+        <div class="faq-item reveal" onclick="this.classList.toggle('open')">
+            <div class="faq-question">
+                <h3>Is GitBlock really free?</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <p>Yes, 100% free for basic usage. No credit card, no subscription, no hidden fees. Node operators earn tokens for serving inference, but users pay nothing.</p>
+            </div>
+        </div>
+        <div class="faq-item reveal" onclick="this.classList.toggle('open')">
+            <div class="faq-question">
+                <h3>How is it free if AI costs money to run?</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <p>Node operators volunteer their GPU hardware and earn tokens as rewards. The network incentivizes compute contribution through token economics, making inference free for users.</p>
+            </div>
+        </div>
+        <div class="faq-item reveal" onclick="this.classList.toggle('open')">
+            <div class="faq-question">
+                <h3>What AI models are available?</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <p>All major open-source models: Llama 3.3, Mistral 7B, Gemma 4, DeepSeek Coder, Qwen 2.5, Phi-3, Yi 1.5, CodeLlama, and 80+ more. All free, all community-powered.</p>
+            </div>
+        </div>
+        <div class="faq-item reveal" onclick="this.classList.toggle('open')">
+            <div class="faq-question">
+                <h3>Is my data safe?</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <p>Yes. All prompts are end-to-end encrypted. They're decrypted only on the serving node, processed, and the response is encrypted back. No central server ever sees your data.</p>
+            </div>
+        </div>
+        <div class="faq-item reveal" onclick="this.classList.toggle('open')">
+            <div class="faq-question">
+                <h3>Can I use it as a drop-in replacement for OpenAI?</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <p>Yes. The API is OpenAI-compatible. Just change the base URL and API key. Same request format, same response format. One line of code to switch.</p>
+            </div>
+        </div>
+        <div class="faq-item reveal" onclick="this.classList.toggle('open')">
+            <div class="faq-question">
+                <h3>How do I run a node and earn tokens?</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <p>Install gitblock-node, register your hardware, and start serving models. Any GPU works — from gaming PCs to data center rigs. More powerful hardware = more requests = more rewards.</p>
+            </div>
+        </div>
+        <div class="faq-item reveal" onclick="this.classList.toggle('open')">
+            <div class="faq-question">
+                <h3>Can I deploy my own GitBlock network?</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <p>Absolutely. Everything is open source under MIT license. Fork the repo, configure your network, deploy your own nodes. Full documentation available on GitHub.</p>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- DONATE -->
+<section class="donate">
+<div class="container">
+    <div class="section-title reveal">
+        <h2>Support GitBlock</h2>
+        <p>Help us build free AI for everyone</p>
+    </div>
+    <div class="donate-box reveal">
+        <h3>Donate & Support</h3>
+        <p>Every contribution helps us maintain servers and grow the network</p>
+        <div class="wallet-address">
+            <span style="flex:1">0xFe3b8aEB4102e904dFCF80e29711Abeaac711C4e</span>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText('0xFe3b8aEB4102e904dFCF80e29711Abeaac711C4e');this.textContent='Copied!'">Copy</button>
+        </div>
+    </div>
+</div>
 </section>
 
 <!-- FOOTER -->
-<footer>
+<footer class="footer">
+<div class="container">
     <div class="footer-grid">
         <div class="footer-brand">
-            <a href="#" class="nav-logo">
-                <div class="logo-icon">GB</div>
-                GitBlock
-            </a>
-            <p>Decentralized AI inference network. Free for users. Open source. Community owned.</p>
+            <a href="#" class="logo"><img src="assets/gitblock.jpg" alt="GitBlock"> GitBlock</a>
+            <p>Decentralized AI inference network. Free for everyone. Open source. Community owned.</p>
         </div>
         <div class="footer-col">
-            <h4>Protocol</h4>
-            <a href="#protocol">How it Works</a>
+            <h4>Product</h4>
             <a href="#features">Features</a>
-            <a href="#security">Security</a>
-            <a href="#token">Tokenomics</a>
+            <a href="#api">API</a>
+            <a href="#quick-start">Quick Start</a>
+            <a href="#providers">Models</a>
+            <a href="#faq">FAQ</a>
         </div>
         <div class="footer-col">
             <h4>Developers</h4>
-            <a href="https://github.com/askexort/gitblock">GitHub</a>
-            <a href="#">Documentation</a>
-            <a href="#">API Reference</a>
-            <a href="#">SDK</a>
+            <a href="https://github.com/Gitblock17/Gitblock">GitHub</a>
+            <a href="#api">Documentation</a>
+            <a href="#api">API Reference</a>
+            <a href="#tutorials">Tutorials</a>
         </div>
         <div class="footer-col">
             <h4>Community</h4>
@@ -1113,14 +705,28 @@
         </div>
     </div>
     <div class="footer-bottom">
-        <span>© 2026 GitBlock. Open Source (MIT License).</span>
+        <span>&copy; 2026 GitBlock. Open Source (MIT License).</span>
         <div class="footer-socials">
-            <a href="https://github.com/askexort/gitblock">GitHub</a>
-            <a href="#">Twitter</a>
-            <a href="#">Telegram</a>
+            <a href="https://github.com/Gitblock17/Gitblock"><i class="fab fa-github"></i></a>
+            <a href="#"><i class="fab fa-telegram"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-discord"></i></a>
         </div>
     </div>
+</div>
 </footer>
 
+<script>
+// Header scroll effect
+window.addEventListener('scroll', () => {
+    document.querySelector('.header').classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// Reveal on scroll
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
 </body>
 </html>
