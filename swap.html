@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swap — GitBlock</title>
+<meta name="description" content="Swap crypto and tokenized stocks on Robinhood Chain via Rialto">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff;
+    --paper:#fbfbfa;
+    --ink:#0a0a0a;
+    --ink-85:rgba(10,10,10,.85);
+    --ink-70:rgba(10,10,10,.68);
+    --ink-45:rgba(10,10,10,.45);
+    --ink-25:rgba(10,10,10,.16);
+    --ink-12:rgba(10,10,10,.10);
+    --white-70:rgba(255,255,255,.72);
+    --white-45:rgba(255,255,255,.45);
+    --white-15:rgba(255,255,255,.14);
+    --ease:cubic-bezier(.16,.8,.24,1);
+    --display:'Space Grotesk',sans-serif;
+    --mono:'JetBrains Mono',monospace;
+    --body:'Inter',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--body);
+    font-size:16px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+  a{color:inherit;text-decoration:none;}
+  ul{list-style:none;}
+  img{max-width:100%;display:block;}
+
+  /* ── Dark rain + clouds (background) ── */
+  .rain-layer{
+    position:fixed;inset:0;pointer-events:none;z-index:0;
+    overflow:hidden;
+  }
+  .rain-drop{
+    position:absolute;top:-30px;
+    width:1.5px;height:28px;
+    background:rgba(10,10,10,.55);
+    border-radius:2px;
+    animation:rain-fall linear infinite;
+  }
+  @keyframes rain-fall{to{transform:translateY(105vh);opacity:0;}}
+
+  .bg-cloud{
+    position:absolute;
+    opacity:.14;
+    animation:cloud-drift 50s linear infinite;
+  }
+  .bg-cloud:nth-child(1){top:5%;left:-8%;width:380px;animation-duration:60s;}
+  .bg-cloud:nth-child(2){top:40%;left:55%;width:300px;animation-duration:45s;animation-delay:-15s;opacity:.10;}
+  .bg-cloud:nth-child(3){top:70%;left:25%;width:250px;animation-duration:55s;animation-delay:-25s;opacity:.08;}
+  @keyframes cloud-drift{
+    0%{transform:translateX(0);}
+    100%{transform:translateX(115vw);}
+  }
+
+  /* ── Nav (mirrors index.html) ── */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(255,255,255,.86);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--ink-12);
+  }
+  .nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:20px 32px;
+    max-width:1180px;margin:0 auto;
+  }
+  .logo{
+    display:flex;align-items:center;gap:10px;
+    font-family:var(--display);
+    font-weight:700;
+    font-size:20px;
+    letter-spacing:-.01em;
+  }
+  .logo img{width:26px;height:26px;border-radius:6px;object-fit:cover;}
+  .nav-links{
+    display:flex;align-items:center;gap:36px;
+  }
+  .nav-links a{
+    font-size:14px;font-weight:500;
+    color:var(--ink-70);
+    transition:color .2s var(--ease);
+  }
+  .nav-links a:hover{color:var(--ink);}
+  .nav-links a.active{color:var(--ink);}
+  .nav-cta{
+    display:inline-flex;align-items:center;gap:8px;
+    background:transparent;
+    color:var(--ink);
+    border:1px solid var(--ink-25);
+    font-size:14px;font-weight:600;
+    padding:11px 20px;
+    border-radius:100px;
+    transition:transform .2s var(--ease),opacity .2s var(--ease);
+    cursor:pointer;
+  }
+  .nav-cta:hover{transform:translateY(-1px);opacity:.88;}
+  .nav-cta.connected{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+
+  /* main — two-column layout like Rialto */
+  main{
+    flex:1;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:40px 32px 80px;
+    position:relative;z-index:1;
+  }
+  .swap-layout{
+    display:grid;
+    grid-template-columns:1.5fr 1fr;
+    gap:24px;
+    width:100%;
+    max-width:1060px;
+    align-items:start;
+  }
+  .swap-chart-col{
+    min-width:0;
+    padding-top:70px;
+  }
+  .swap-form-col{
+    min-width:0;
+    max-width:400px;
+  }
+  .swap-head{text-align:left;margin-bottom:20px;}
+  .swap-head h1{
+    font-family:var(--display);
+    font-weight:700;font-size:28px;
+    letter-spacing:-.02em;margin-bottom:6px;
+  }
+  .swap-head p{font-size:14px;color:var(--ink-45);max-width:36ch;}
+  .swap-card{
+    border:1px solid var(--ink-25);
+    border-radius:16px;background:var(--paper);padding:22px;
+  }
+  .swap-field{margin-bottom:6px;}
+  .swap-field label{
+    display:block;
+    font-family:var(--mono);font-size:10px;
+    letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-45);margin-bottom:7px;padding-left:4px;
+  }
+  .swap-row{display:flex;gap:8px;align-items:stretch;}
+  .token-btn{
+    display:flex;align-items:center;gap:10px;
+    padding:11px 14px;
+    border:1px solid var(--ink-25);border-radius:12px;
+    background:var(--bg);
+    cursor:pointer;
+    font-family:var(--body);font-size:15px;font-weight:600;
+    color:var(--ink);
+    white-space:nowrap;min-width:145px;
+    transition:border-color .2s var(--ease);
+  }
+  .token-btn:hover{border-color:var(--ink);}
+  .token-btn img{width:24px;height:24px;border-radius:5px;object-fit:contain;flex:none;}
+  .token-btn .chevron{margin-left:auto;font-size:10px;color:var(--ink-45);transition:transform .2s var(--ease);}
+  .token-btn.open .chevron{transform:rotate(180deg);}
+  .swap-row input{
+    flex:1;
+    font-family:var(--mono);font-size:18px;font-weight:500;
+    padding:11px 14px;
+    border:1px solid var(--ink-25);border-radius:12px;
+    background:var(--bg);color:var(--ink);
+    outline:none;text-align:right;min-width:0;
+    transition:border-color .2s var(--ease);
+  }
+  .swap-row input:focus{border-color:var(--ink);}
+  .swap-row input::placeholder{color:var(--ink-25);}
+  .swap-row input[readonly]{background:var(--paper);color:var(--ink-45);}
+
+  .token-select{position:relative;}
+  .token-list{
+    display:none;
+    position:absolute;top:calc(100% + 4px);left:0;
+    z-index:20;
+    background:var(--bg);
+    border:1px solid var(--ink-25);border-radius:12px;
+    width:290px;max-height:320px;overflow-y:auto;
+    box-shadow:0 12px 40px rgba(0,0,0,.10);
+  }
+  .token-list.open{display:block;}
+  .token-list .search-box{
+    position:sticky;top:0;padding:10px;
+    background:var(--bg);
+    border-bottom:1px solid var(--ink-12);z-index:1;
+  }
+  .token-list .search-box input{
+    width:100%;padding:9px 12px;
+    border:1px solid var(--ink-25);border-radius:8px;
+    font-family:var(--body);font-size:13px;
+    outline:none;background:var(--paper);
+  }
+  .token-list .search-box input:focus{border-color:var(--ink);}
+  .token-item{
+    display:flex;align-items:center;gap:10px;
+    padding:11px 14px;cursor:pointer;
+    font-size:14px;font-weight:500;
+    transition:background .1s var(--ease);
+  }
+  .token-item:hover{background:var(--ink-12);}
+  .token-item img{width:32px;height:32px;border-radius:6px;object-fit:contain;flex:none;}
+  .token-item .token-symbol{font-weight:600;font-family:var(--mono);font-size:13px;}
+  .token-item .token-name{font-size:12px;color:var(--ink-45);}
+
+  .swap-arrow{display:flex;justify-content:center;margin:3px 0;}
+  .swap-arrow button{
+    width:32px;height:32px;border-radius:50%;
+    border:1px solid var(--ink-25);background:var(--bg);
+    display:flex;align-items:center;justify-content:center;
+    font-size:15px;color:var(--ink-45);cursor:pointer;
+    transition:border-color .2s var(--ease),color .2s var(--ease);
+    z-index:1;position:relative;
+  }
+  .swap-arrow button:hover{border-color:var(--ink);color:var(--ink);}
+
+  .swap-info{
+    display:flex;justify-content:space-between;
+    font-family:var(--mono);font-size:11px;
+    color:var(--ink-45);padding:8px 4px;
+  }
+  .swap-info.hidden{display:none;}
+
+  .swap-submit{
+    width:100%;padding:15px;border-radius:12px;
+    background:var(--ink);color:var(--bg);
+    font-family:var(--display);font-size:15px;font-weight:600;
+    letter-spacing:-.01em;cursor:pointer;border:none;margin-top:6px;
+    transition:transform .2s var(--ease),opacity .2s var(--ease);
+  }
+  .swap-submit:hover{transform:translateY(-1px);opacity:.88;}
+  .swap-submit:disabled{opacity:.35;transform:none;cursor:not-allowed;}
+
+  .swap-powered{
+    text-align:center;margin-top:18px;
+    font-size:11px;color:var(--ink-45);font-family:var(--mono);
+  }
+  .swap-powered a{text-decoration:underline;color:var(--ink-45);}
+  .swap-powered a:hover{color:var(--ink);}
+
+  /* chart */
+  .tv-chart-wrap{
+    border:1px solid var(--ink-25);
+    border-radius:14px;
+    overflow:hidden;
+    background:var(--bg);
+    aspect-ratio:16/9;
+    width:100%;
+  }
+  .tv-chart-wrap .tradingview-widget-container{
+    height:100%;
+  }
+
+  @media (max-width:700px){
+    .swap-layout{grid-template-columns:1fr;}
+    .swap-chart-col{padding-top:0;}
+    .swap-form-col{max-width:none;}
+    .tv-chart-wrap{aspect-ratio:auto;height:380px;}
+    .tv-chart-wrap.expanded{position:fixed;inset:60px 0 0 0;z-index:30;height:auto;border-radius:0;border:none;}
+    main{padding:24px 16px 64px;}
+    .swap-card{padding:18px 14px;}
+    .swap-row input{font-size:16px;padding:10px 12px;}
+    .token-btn{font-size:13px;min-width:120px;padding:9px 10px;}
+    .swap-head h1{font-size:24px;}
+  }
+
+  /* footer */
+  footer{
+    background:var(--ink);
+    color:var(--white-70);
+    padding:20px 0 14px;
+    position:relative;z-index:1;
+  }
+  footer .wrap{max-width:1180px;margin:0 auto;padding:0 32px;}
+  .foot-top{
+    display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;
+    padding-bottom:16px;
+    border-bottom:1px solid var(--white-15);
+  }
+  .foot-brand .logo{color:var(--bg);}
+  .foot-brand p{
+    margin-top:6px;max-width:34ch;
+    font-size:13px;color:var(--white-45);line-height:1.5;
+  }
+  .foot-cols{display:flex;gap:48px;}
+  .foot-col h4{
+    font-family:var(--mono);font-size:10px;
+    letter-spacing:.08em;text-transform:uppercase;
+    color:var(--white-45);margin-bottom:10px;
+  }
+  .foot-col a{display:block;font-size:13px;color:var(--white-70);padding:3px 0;transition:color .2s var(--ease);}
+  .foot-col a:hover{color:var(--bg);}
+  .foot-bottom{
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+    padding-top:14px;font-size:11px;color:var(--white-45);
+  }
+  .foot-bottom .disclaimer{max-width:60ch;line-height:1.5;}
+
+  .toast{
+    position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+    background:var(--ink);color:var(--bg);
+    padding:12px 22px;border-radius:100px;
+    font-size:13px;font-weight:500;z-index:100;
+    opacity:0;pointer-events:none;
+    transition:opacity .25s var(--ease);
+  }
+  .toast.show{opacity:1;}
+
+  @media (max-width:820px){
+    .nav-links a.nav-link-text{display:none;}
+  }
+  @media (max-width:500px){
+    .nav{padding:12px 16px;}
+    .back-btn span{display:none;}
+    .logo{font-size:16px;}
+    .logo img{width:22px;height:22px;}
+    .nav-cta{font-size:12px;padding:7px 14px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- Dark rain + clouds -->
+<div class="rain-layer" id="rainLayer">
+  <svg class="bg-cloud" viewBox="0 0 380 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M70 110C35 110 5 82 10 48C3 28 20 5 48 3C58-10 88-8 98 8C118-10 160 2 155 35C175 35 195 50 190 72C205 88 198 120 168 110H70Z" fill="#0a0a0a"/>
+  </svg>
+  <svg class="bg-cloud" viewBox="0 0 300 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M55 100C25 100 0 72 5 35C-2 15 12-5 38-3C48-15 75-12 82 5C100-6 135 5 130 32C148 32 165 48 160 68C175 80 168 110 140 100H55Z" fill="#0a0a0a"/>
+  </svg>
+  <svg class="bg-cloud" viewBox="0 0 250 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M45 95C22 95 0 72 5 42C-2 22 14-2 35-1C45-12 68-10 75 5C90-5 112 5 110 28C125 30 138 42 135 58C145 65 140 100 118 95H45Z" fill="#0a0a0a"/>
+  </svg>
+</div>
+
+<!-- Nav — identical to index.html -->
+<header>
+  <nav class="nav">
+    <a href="/" class="logo">
+      <img src="/logo.jpg" alt="GitBlock" style="width:26px;height:26px;border-radius:6px;object-fit:cover">
+      GitBlock
+    </a>
+    <ul class="nav-links">
+      <li><a href="/#how" class="nav-link-text">How it works</a></li>
+      <li><a href="/#pools" class="nav-link-text">Pools</a></li>
+      <li><a href="/swap" class="active nav-link-text">Swap</a></li>
+      <li><a href="/#faq" class="nav-link-text">FAQ</a></li>
+      <li><button class="nav-cta" id="walletBtn">Connect Wallet</button></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <div class="swap-layout">
+    <!-- LEFT: Chart -->
+    <div class="swap-chart-col">
+      <div class="tv-chart-wrap" id="tvChartWrap">
+        <div class="tradingview-widget-container" id="tvWidget"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Swap form -->
+    <div class="swap-form-col">
+      <div class="swap-head">
+        <h1>Swap</h1>
+        <p>Best execution via Rialto on Robinhood Chain</p>
+      </div>
+
+      <div class="swap-card">
+        <div class="swap-field">
+          <label>Sell</label>
+          <div class="swap-row">
+            <div class="token-select" id="sellSelectWrap">
+              <button class="token-btn" id="sellTokenBtn">
+                <img src="" alt="" id="sellTokenImg">
+                <span id="sellTokenLabel">ETH</span>
+                <span class="chevron">▾</span>
+              </button>
+              <div class="token-list" id="sellTokenList"></div>
+            </div>
+            <input type="number" id="sellAmount" placeholder="0.00" step="any" min="0">
+          </div>
+        </div>
+        <div class="swap-arrow">
+          <button id="flipBtn">↓</button>
+        </div>
+        <div class="swap-field">
+          <label>Buy</label>
+          <div class="swap-row">
+            <div class="token-select" id="buySelectWrap">
+              <button class="token-btn" id="buyTokenBtn">
+                <img src="" alt="" id="buyTokenImg">
+                <span id="buyTokenLabel">USDG</span>
+                <span class="chevron">▾</span>
+              </button>
+              <div class="token-list" id="buyTokenList"></div>
+            </div>
+            <input type="text" id="buyAmount" placeholder="0.00" readonly>
+          </div>
+        </div>
+        <div class="swap-info hidden" id="rateRow">
+          <span>Rate</span><span id="swapRate">—</span>
+        </div>
+        <div class="swap-info">
+          <span>GitBlock fee</span><span>0.30%</span>
+        </div>
+        <button class="swap-submit" id="swapSubmit" disabled>Connect wallet to swap</button>
+      </div>
+
+      <div class="swap-powered">
+        Swaps powered by <a href="https://rialto.xyz" target="_blank" rel="noopener">Rialto</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Footer — identical to index.html -->
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a href="/" class="logo">
+          <img src="/logo.jpg" alt="GitBlock" style="width:26px;height:26px;border-radius:6px;object-fit:cover">
+          GitBlock
+        </a>
+        <p>A USDC yield aggregator for real-world assets. Deposit once — GitBlock finds the rain.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h4>Product</h4>
+          <a href="/#how">How it works</a>
+          <a href="/#pools">Pools</a>
+          <a href="/#faq">FAQ</a>
+        </div>
+        <div class="foot-col">
+          <h4>Community</h4>
+          <a href="https://x.com/gitblock_" target="_blank" rel="noopener">X / Twitter</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 GitBlock Protocol</span>
+      <span class="disclaimer">GitBlock is a yield-routing protocol, not a bank or investment adviser. RWA pools carry credit, counterparty, and liquidity risk. Nothing here is financial advice.</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── Rain ──
+  (function(){
+    const layer = document.getElementById('rainLayer');
+    for(let i=0;i<50;i++){
+      const d=document.createElement('div');
+      d.className='rain-drop';
+      d.style.left=Math.random()*100+'%';
+      d.style.height=(18+Math.random()*28)+'px';
+      d.style.animationDuration=(1.4+Math.random()*1.8)+'s';
+      d.style.animationDelay=Math.random()*2.2+'s';
+      d.style.opacity=(0.3+Math.random()*0.4);
+      layer.appendChild(d);
+    }
+  })();
+
+  // ── Config ──
+  const PROXY='/api/rialto';
+  const INTEGRATOR_FEE_BPS=30;
+  const SLIPPAGE_BPS=50;
+  const CHAIN_ID=4663;
+
+  // ── Token logos: Rialto's own CDN (same logos as rialto.xyz/swap) ──
+  // Rialto hosts all token logos at their CDN — always real, always loads.
+  const LOGO_TYPES = {
+    // ETFs
+    QQQ:1,SGOV:1,SLV:1,SPY:1,USO:1,
+    // Tokens
+    ETH:2,WETH:2,USDG:2,USDC:2,
+  };
+  function logoURL(sym){
+    if(LOGO_TYPES[sym]===1) return `https://rialto-terminal-backend.rialto.xyz/static/icons/etfs/${sym}.webp`;
+    if(LOGO_TYPES[sym]===2) return `https://rialto-terminal-backend.rialto.xyz/static/icons/tokens/${sym}.webp`;
+    // Stocks (default)
+    return `https://rialto-terminal-backend.rialto.xyz/static/icons/stocks/${sym}.webp`;
+  }
+
+  function logoHTML(sym){
+    return `<img src="${logoURL(sym)}" alt="${sym}">`;
+  }
+
+  // ── TradingView chart ──
+  function tvSymbol(sym){
+    // Map to TradingView symbol format
+    const TV_MAP = {ETH:'BINANCE:ETHUSDT',WETH:'BINANCE:ETHUSDT',USDG:'BINANCE:USDCUSDT',USDC:'BINANCE:USDCUSDT'};
+    if(TV_MAP[sym]) return TV_MAP[sym];
+    return sym; // Stocks/ETFs work with plain ticker
+  }
+  function loadChart(sym){
+    const container = document.getElementById('tvWidget');
+    // Remove old iframe if any
+    container.innerHTML = '';
+    const s = tvSymbol(sym);
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://s.tradingview.com/widgetembed/?frameElementId=tvframe&symbol=${encodeURIComponent(s)}&interval=D&hidesidetoolbar=1&symboledit=0&saveimage=0&toolbarbg=f1f3f6&studies=[]&theme=dark&style=1&timezone=exchange&withdateranges=1&showpopup_button=0&width=100%25&height=100%25&utm_source=gitblock&utm_medium=widget`;
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.style.border = 'none';
+    iframe.allowTransparency = 'true';
+    iframe.scrolling = 'no';
+    container.appendChild(iframe);
+  }
+
+  // ── State ──
+  let tokens=[],currentQuote=null,walletAddress=null,sellToken='ETH',buyToken='USDG';
+
+  const walletBtn=document.getElementById('walletBtn');
+  const sellTokenBtn=document.getElementById('sellTokenBtn');
+  const buyTokenBtn=document.getElementById('buyTokenBtn');
+  const sellTokenImg=document.getElementById('sellTokenImg');
+  const buyTokenImg=document.getElementById('buyTokenImg');
+  const sellTokenLabel=document.getElementById('sellTokenLabel');
+  const buyTokenLabel=document.getElementById('buyTokenLabel');
+  const sellTokenList=document.getElementById('sellTokenList');
+  const buyTokenList=document.getElementById('buyTokenList');
+  const sellAmountEl=document.getElementById('sellAmount');
+  const buyAmountEl=document.getElementById('buyAmount');
+  const swapSubmit=document.getElementById('swapSubmit');
+  const flipBtn=document.getElementById('flipBtn');
+  const rateRow=document.getElementById('rateRow');
+  const swapRate=document.getElementById('swapRate');
+  const toast=document.getElementById('toast');
+
+  function showToast(msg){toast.textContent=msg;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2500);}
+  function shorten(addr){return addr.slice(0,6)+'...'+addr.slice(-4);}
+
+  // ── Wallet ──
+  async function connectWallet(){
+    if(walletAddress){disconnectWallet();return;}
+    if(!window.ethereum){showToast('No wallet detected');return;}
+    try{
+      const accs=await window.ethereum.request({method:'eth_requestAccounts'});
+      walletAddress=accs[0];
+      walletBtn.textContent=shorten(walletAddress);
+      walletBtn.classList.add('connected');
+      updateSubmitButton();fetchQuote();
+    }catch(e){if(e.code!==4001)showToast('Wallet connection failed');}
+  }
+  function disconnectWallet(){
+    walletAddress=null;walletBtn.textContent='Connect Wallet';
+    walletBtn.classList.remove('connected');
+    updateSubmitButton();
+  }
+  walletBtn.addEventListener('click',connectWallet);
+  if(window.ethereum){
+    window.ethereum.on('accountsChanged',accs=>{
+      walletAddress=accs[0]||null;
+      if(walletAddress){walletBtn.textContent=shorten(walletAddress);walletBtn.classList.add('connected');}
+      else disconnectWallet();
+      updateSubmitButton();
+      if(walletAddress)fetchQuote();
+    });
+  }
+
+  // ── Token list ──
+  function buildTokenList(container,onClick){
+    let html=`<div class="search-box"><input type="text" placeholder="Search..." oninput="filterTokens(this,'${container.id}')"></div>`;
+    tokens.forEach(t=>{
+      html+=`<div class="token-item" data-symbol="${t.symbol}" data-name="${t.name.toLowerCase()}" onclick="event.stopPropagation();${onClick}('${t.symbol}')">${logoHTML(t.symbol)}<div><div class="token-symbol">${t.symbol}</div><div class="token-name">${t.name}</div></div></div>`;
+    });
+    container.innerHTML=html;
+  }
+  window.filterTokens=function(input,listId){
+    const q=input.value.toLowerCase();
+    document.getElementById(listId).querySelectorAll('.token-item').forEach(el=>{
+      el.style.display=(el.dataset.symbol.toLowerCase().includes(q)||el.dataset.name.includes(q))?'':'none';
+    });
+  };
+  function setTokenBtn(img,label,sym){
+    img.src=logoURL(sym);
+    label.textContent=sym;
+  }
+  function selectSellToken(sym){sellToken=sym;setTokenBtn(sellTokenImg,sellTokenLabel,sym);sellTokenList.classList.remove('open');sellTokenBtn.classList.remove('open');fetchQuote();loadChart(sym);}
+  function selectBuyToken(sym){buyToken=sym;setTokenBtn(buyTokenImg,buyTokenLabel,sym);buyTokenList.classList.remove('open');buyTokenBtn.classList.remove('open');fetchQuote();}
+  window.selectSellToken=selectSellToken;window.selectBuyToken=selectBuyToken;
+
+  async function loadTokens(){
+    try{
+      const resp=await fetch(`${PROXY}?endpoint=tokens`);
+      const data=await resp.json();
+      if(data.tokens){
+        tokens=data.tokens;
+        buildTokenList(sellTokenList,'selectSellToken');
+        buildTokenList(buyTokenList,'selectBuyToken');
+        const eth=tokens.find(t=>t.symbol==='ETH'||t.symbol==='WETH');
+        const stable=tokens.find(t=>t.symbol==='USDG'||t.symbol==='USDC');
+        if(eth){sellToken=eth.symbol;setTokenBtn(sellTokenImg,sellTokenLabel,eth.symbol);loadChart(eth.symbol);}
+        if(stable){buyToken=stable.symbol;setTokenBtn(buyTokenImg,buyTokenLabel,stable.symbol);}
+      }
+    }catch(e){console.error('Token load error:',e);}
+  }
+
+  // ── Dropdowns ──
+  function closeAllDropdowns(){sellTokenList.classList.remove('open');buyTokenList.classList.remove('open');sellTokenBtn.classList.remove('open');buyTokenBtn.classList.remove('open');}
+  sellTokenBtn.addEventListener('click',e=>{e.stopPropagation();const open=sellTokenList.classList.contains('open');closeAllDropdowns();if(!open){sellTokenList.classList.add('open');sellTokenBtn.classList.add('open');}});
+  buyTokenBtn.addEventListener('click',e=>{e.stopPropagation();const open=buyTokenList.classList.contains('open');closeAllDropdowns();if(!open){buyTokenList.classList.add('open');buyTokenBtn.classList.add('open');}});
+  document.addEventListener('click',closeAllDropdowns);
+
+  // ── Quote ──
+  function updateSubmitButton(){
+    if(!walletAddress){swapSubmit.disabled=true;swapSubmit.textContent='Connect wallet to swap';return;}
+    if(!currentQuote){swapSubmit.disabled=true;swapSubmit.textContent='Enter amount';return;}
+    swapSubmit.disabled=false;swapSubmit.textContent='Swap';
+  }
+  async function fetchQuote(){
+    const amount=sellAmountEl.value;
+    if(!sellToken||!buyToken||!amount||parseFloat(amount)<=0||!walletAddress){currentQuote=null;buyAmountEl.value='';rateRow.classList.add('hidden');updateSubmitButton();return;}
+    try{
+      const p=new URLSearchParams({endpoint:'quote',sell_token:sellToken,buy_token:buyToken,sell_amount:amount,taker:walletAddress,slippage_bps:SLIPPAGE_BPS,chain_id:CHAIN_ID,swap_fee_bps:INTEGRATOR_FEE_BPS});
+      const resp=await fetch(`${PROXY}?${p}`);
+      const data=await resp.json();
+      if(data.error){currentQuote=null;updateSubmitButton();return;}
+      currentQuote=data;
+      const buyDec=tokens.find(t=>t.symbol===buyToken)?.decimals||18;
+      const buyAmt=Number(data.buy_amount)/Math.pow(10,buyDec);
+      buyAmountEl.value=buyAmt.toFixed(buyDec>6?6:buyDec);
+      swapRate.textContent=`1 ${sellToken} = ${(buyAmt/parseFloat(amount)).toFixed(6)} ${buyToken}`;
+      rateRow.classList.remove('hidden');
+      updateSubmitButton();
+    }catch(e){currentQuote=null;updateSubmitButton();}
+  }
+  let qt;sellAmountEl.addEventListener('input',()=>{clearTimeout(qt);qt=setTimeout(fetchQuote,400);});
+  flipBtn.addEventListener('click',()=>{[sellToken,buyToken]=[buyToken,sellToken];setTokenBtn(sellTokenImg,sellTokenLabel,sellToken);setTokenBtn(buyTokenImg,buyTokenLabel,buyToken);fetchQuote();});
+
+  // ── Execute ──
+  swapSubmit.addEventListener('click',async()=>{
+    if(!walletAddress||!currentQuote||!window.ethereum)return;
+    const q=currentQuote;swapSubmit.disabled=true;swapSubmit.textContent='Signing...';
+    try{
+      if(q.issues?.allowance){swapSubmit.textContent='Approving...';const d='0x095ea7b3'+q.issues.allowance.spender.slice(2).padStart(64,'0')+BigInt(q.sell_amount).toString(16).padStart(64,'0');try{await window.ethereum.request({method:'eth_sendTransaction',params:[{to:q.sell_token,data:d,from:walletAddress}]});await new Promise(r=>setTimeout(r,4000));}catch(e){if(e.code===4001){swapSubmit.textContent='Swap';swapSubmit.disabled=false;return;}throw e;}}
+      if(q.settlement==='permit2'&&q.permit2){swapSubmit.textContent='Sign Permit2...';const sig=await window.ethereum.request({method:'eth_signTypedData_v4',params:[walletAddress,JSON.stringify({domain:q.permit2.domain,types:Object.fromEntries(Object.entries(q.permit2.types).filter(([k])=>k!=='EIP712Domain')),primaryType:q.permit2.primaryType,message:q.permit2.message})]});const sg=sig.startsWith('0x')?sig.slice(2):sig;const dd=q.tx.data.startsWith('0x')?q.tx.data.slice(2):q.tx.data;const off=q.tx.signature_offset*2;swapSubmit.textContent='Submitting...';await window.ethereum.request({method:'eth_sendTransaction',params:[{to:q.tx.to,data:'0x'+dd.slice(0,off)+sg+dd.slice(off+sg.length),value:q.tx.value||'0x0',from:walletAddress}]});}
+      else if(q.settlement==='allowance'){swapSubmit.textContent='Submitting...';await window.ethereum.request({method:'eth_sendTransaction',params:[{to:q.tx.to,data:q.tx.data,value:q.tx.value||'0x0',from:walletAddress}]});}
+      else throw new Error('Unknown settlement: '+q.settlement);
+      swapSubmit.textContent='Done! \u2713';sellAmountEl.value='';currentQuote=null;buyAmountEl.value='';showToast('Swap submitted!');setTimeout(()=>updateSubmitButton(),3000);
+    }catch(e){swapSubmit.textContent=e.code===4001?'Rejected':'Error \u2014 retry';swapSubmit.disabled=false;setTimeout(()=>updateSubmitButton(),2500);}
+  });
+  // ── Chart expand on mobile ──
+  document.getElementById('tvChartWrap').addEventListener('click', function(){
+    if(window.innerWidth<=700){
+      this.classList.toggle('expanded');
+    }
+  });
+
+  loadTokens().then(() => updateSubmitButton());
+</script>
+</body>
+</html>
