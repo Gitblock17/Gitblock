@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/api/rialto/(.*)", "destination": "/api/rialto" },
+    { "source": "/swap", "destination": "/swap.html" }
+  ]
+}

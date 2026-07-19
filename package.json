@@ -1,0 +1,8 @@
+{
+  "name": "gitblock-site",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {}
+}

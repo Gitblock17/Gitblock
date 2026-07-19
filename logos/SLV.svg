@@ -1,0 +1,7 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'>
+  <rect width='40' height='40' rx='8' fill='#1a1a1a'/>
+  <circle cx='13' cy='20' r='9' fill='none' stroke='#c0c0c0' stroke-width='2.5'/>
+  <text x='13' y='25' text-anchor='middle' font-size='14' font-weight='700' fill='#c0c0c0' font-family='sans-serif'>i</text>
+  <polygon points='28,10 32,12 28,14 24,12' fill='#c0c0c0'/>
+  <text x='28' y='29' text-anchor='middle' font-size='9' font-weight='600' fill='white' font-family='sans-serif'>SLV</text>
+</svg>
