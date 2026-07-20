@@ -484,10 +484,19 @@
   })();
 
   // ── Config ──
-  const PROXY='/api/rialto';
+  const RIALTO_API='https://rialto-trade-api.rialto.xyz';
+  const RIALTO_KEY=''; // Add your Rialto API key here
   const INTEGRATOR_FEE_BPS=30;
   const SLIPPAGE_BPS=50;
   const CHAIN_ID=4663;
+
+  async function rialtoFetch(endpoint, params={}){
+    const url = `${RIALTO_API}/${endpoint}?${new URLSearchParams(params)}`;
+    const headers = {'Content-Type':'application/json'};
+    if(RIALTO_KEY) headers['Authorization'] = `Bearer ${RIALTO_KEY}`;
+    const resp = await fetch(url, {headers});
+    return resp.json();
+  }
 
   // ── Token logos: Rialto's own CDN (same logos as rialto.xyz/swap) ──
   // Rialto hosts all token logos at their CDN — always real, always loads.
@@ -605,8 +614,7 @@
 
   async function loadTokens(){
     try{
-      const resp=await fetch(`${PROXY}?endpoint=tokens`);
-      const data=await resp.json();
+      const data=await rialtoFetch('tokens');
       if(data.tokens){
         tokens=data.tokens;
         buildTokenList(sellTokenList,'selectSellToken');
@@ -635,9 +643,7 @@
     const amount=sellAmountEl.value;
     if(!sellToken||!buyToken||!amount||parseFloat(amount)<=0||!walletAddress){currentQuote=null;buyAmountEl.value='';rateRow.classList.add('hidden');updateSubmitButton();return;}
     try{
-      const p=new URLSearchParams({endpoint:'quote',sell_token:sellToken,buy_token:buyToken,sell_amount:amount,taker:walletAddress,slippage_bps:SLIPPAGE_BPS,chain_id:CHAIN_ID,swap_fee_bps:INTEGRATOR_FEE_BPS});
-      const resp=await fetch(`${PROXY}?${p}`);
-      const data=await resp.json();
+      const data=await rialtoFetch('quote',{sell_token:sellToken,buy_token:buyToken,sell_amount:amount,taker:walletAddress,slippage_bps:SLIPPAGE_BPS,chain_id:CHAIN_ID,swap_fee_bps:INTEGRATOR_FEE_BPS});
       if(data.error){currentQuote=null;updateSubmitButton();return;}
       currentQuote=data;
       const buyDec=tokens.find(t=>t.symbol===buyToken)?.decimals||18;
