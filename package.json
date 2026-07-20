@@ -1,0 +1,8 @@
+{
+  "name": "cloud-site",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {}
+}
